@@ -7,13 +7,13 @@ namespace StoryGenApp.Shared.Models
     public class SerializableChatMessage
     {
         [JsonProperty("role")]
-        public string Role { get; set; }
+        public string? Role { get; set; }
 
         [JsonProperty("content")]
-        public string Content { get; set; }
+        public string? Content { get; set; }
 
         [JsonProperty("name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         public SerializableChatMessage(string role = null, string content = null, string name = null)
         {
