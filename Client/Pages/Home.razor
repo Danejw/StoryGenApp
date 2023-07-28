@@ -1,0 +1,106 @@
+@page "/"
+@using Radzen.Blazor
+
+<RadzenCard Style="background-image: url('/images/HeroBackground.png'); background-size: cover; color: #1a1a1a; text-align: center; padding: 100px 0; margin-bottom: 10px;">
+        <RadzenHeading Size="H1" Text="StoryGen" Style="font-size: 60px; color: #000" />
+        <RadzenHeading Size="H3" Text="Unleashing Your Inner Storytelling Genius" Style="margin-top: 20px; color: black" />
+    <RadzenButton Text="Tell Your Story" Style="margin-top: 20px; color: black" Click="NavigateToStoryDesigner" />
+</RadzenCard>
+
+<RadzenCard Style="padding: 30px; margin-bottom: 10px;">
+    <RadzenHeading Size="H2" Text="Your Journey Begins Here" Style="text-align: center;" />
+    <RadzenRow>
+        <RadzenColumn Size="12" SizeXS="12">
+            <RadzenCard Style="margin: 5px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <RadzenIcon Icon="settings" Size="40px" Color="#1a1a1a" />
+                <RadzenHeading Size="H3" Text="Choose Your Adventure" />
+                <div style="text-align: center;">
+                    <p>Pick a genre, imagine your characters, and set the stage. The world is your canvas and the possibilities are limitless.</p>
+                </div>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeXS="12">
+            <RadzenCard Style="margin: 5px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <RadzenIcon Icon="cloud" Size="40px" Color="#1a1a1a" />
+                <RadzenHeading Size="H3" Text="Watch the Magic Unfold" />
+                <div style="text-align: center;">
+                    <p>Sit back and watch as our AI transforms your ideas into a rich, captivating narrative. Every click brings a new twist to your tale.</p>
+                </div>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeXS="12">
+            <RadzenCard Style="margin: 5px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <RadzenIcon Icon="edit" Size="40px" Color="#1a1a1a" />
+                <RadzenHeading Size="H3" Text="Craft Your Masterpiece" />
+                <div style="text-align: center;">
+                    <p>Now it's your turn to shine. Add your personal touch, polish your story, and make it truly yours. Let's craft your masterpiece together.</p>
+                </div>
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenCard>
+
+<RadzenCard Style="padding: 30px; margin-bottom: 10px;">
+    <RadzenHeading Size="H2" Text="Your Journey Begins Here" Style="text-align: center;" />
+    <RadzenRow>
+        <RadzenColumn Size="12" SizeXS="12">
+            <RadzenCard Style="margin: 5px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <RadzenIcon Icon="create" Size="40px" Color="#1a1a1a" />
+                <RadzenHeading Size="H3" Text="Story Designer" />
+                <div style="text-align: center;">
+                    <p>The Story Designer is your creative partner, ready to weave your ideas into an engaging narrative. It takes your input and turns it into a unique story, making you the master of your tale.</p>
+                </div>
+                <RadzenButton Text="Create Your Story" Style="margin-top: 20px; color: black" Click="NavigateToStoryDesigner" />
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeXS="12">
+            <RadzenCard Style="margin: 5px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <RadzenIcon Icon="emoji_people" Size="40px" Color="#1a1a1a" />
+                <RadzenHeading Size="H3" Text="Character Designer" />
+                <div style="text-align: center;">
+                    <p>The Character Designer breathes life into your story. It helps you create rich, multi-dimensional characters that resonate with readers. Your characters' quirks, desires, and conflicts are all shaped here.</p>
+                </div>
+                <RadzenButton Text="Create Your Character" Style="margin-top: 20px; color: black" Click="NavigateToCharacterDesigner" />
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeXS="12">
+            <RadzenCard Style="margin: 5px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <RadzenIcon Icon="landscape" Size="40px" Color="#1a1a1a" />
+                <RadzenHeading Size="H3" Text="Environment Designer" />
+                <div style="text-align: center;">
+                    <p>The Environment Designer sets the stage for your story. It helps you craft immersive worlds and settings, making readers feel like they're right there in the middle of the action.</p>
+                </div>
+                <RadzenButton Text="Create Your Environment" Style="margin-top: 20px; color: black" Click="NavigateToEnvironmentDesigner" />
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenCard>
+
+
+
+<RadzenCard Style="padding: 30px; margin-bottom: 10px;">
+    <RadzenHeading Size="H2" Text="Ready to Write Your Next Great Story?" Style="text-align: center;" />
+    <RadzenButton Text="Unleash Your Creativity Now" Style="display: block; margin: 30px auto;" Click="NavigateToChatManager" />
+</RadzenCard>
+
+@code {
+    private void NavigateToStoryDesigner()
+    {
+        NavigationManager.NavigateTo("/StoryDesigner");
+    }
+
+    private void NavigateToChatManager()
+    {
+        NavigationManager.NavigateTo("/ChatManager");
+    }
+
+    private void NavigateToCharacterDesigner()
+    {
+        NavigationManager.NavigateTo("/CharacterDesigner");
+    }
+
+    private void NavigateToEnvironmentDesigner()
+    {
+        NavigationManager.NavigateTo("/EnvironmentDesigner");
+    }
+}

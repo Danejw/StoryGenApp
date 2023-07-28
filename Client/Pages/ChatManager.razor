@@ -1,0 +1,128 @@
+@page "/ChatManager"
+@using Radzen.Blazor
+@using Microsoft.AspNetCore.Components
+@using Radzen;
+@using StoryGenApp.Shared.Models;
+@using System.Diagnostics;
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
+@using Blazored.LocalStorage;
+
+
+@foreach (var bot in bots)
+{
+    <RadzenButton Text="@($"{bot.Key}")" Click="@(() => bot.IsVisible = !bot.IsVisible)" />
+}
+
+<!--Master Document-->
+<RadzenCard Style="height: auto; overflow: auto; margin: 10px 0;">
+
+    <RadzenRow>
+        <RadzenColumn Size="10">
+            <RadzenHeading Size="H3" Text="Master Document" Style="text-align: center; margin: 10px 0;" />
+        </RadzenColumn>
+        <RadzenColumn Size="2">
+            <RadzenButton Text="Export" Size="ButtonSize.Small" Click="@(() => ExportMasterDocument())" Style="float:right;" />
+        </RadzenColumn>
+    </RadzenRow>
+
+    @foreach (var entry in masterDocument)
+    {
+        <RadzenCard Style="margin: 10px;">
+            <RadzenContent>
+                <RadzenRow>
+                    <RadzenColumn Size="10" Style="word-wrap: break-word;">
+                        @if (!entry.IsEditing)
+                        {
+                            <p>@entry.Text</p>
+                        }
+                        else
+                        {
+                            <RadzenTextBox @bind-Value="entry.Text" Style="width: 80%;" />
+                        }
+                    </RadzenColumn>
+                    <RadzenColumn Size="2">
+                        @if (!entry.IsEditing)
+                        {
+                            <RadzenButton Text="Edit" Size="ButtonSize.ExtraSmall" Click="@(() => entry.IsEditing = true)" Style="float:right;" />
+                            <RadzenButton Text="Delete" Size="ButtonSize.ExtraSmall" ButtonStyle="ButtonStyle.Danger" Click="(() => RemoveMessage(entry))" Style="float:right;" />
+                        }
+                        else
+                        {
+                            <RadzenButton Text="OK" Size="ButtonSize.Medium" Click="@(() => entry.IsEditing = false)" Style="float:right;" />
+                        }
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenContent>
+        </RadzenCard>
+    }
+</RadzenCard>
+
+<!--Chat Windows-->
+@foreach (var bot in bots)
+{
+    if (bot.IsVisible)
+    {
+        <RadzenCard Style="margin-top: 10px;">
+            <DynamicComponent Type="@bot.ComponentType" />
+        </RadzenCard>
+    }
+}
+
+
+@code {
+    List<Bot> bots = new List<Bot>
+    {
+        new Bot { Key = "Story Designer", ComponentType = typeof(StoryChat) },
+        new Bot { Key = "Environment Designer", ComponentType = typeof(EnvironmentChat) },
+        new Bot { Key = "Character Designer", ComponentType = typeof(CharacterChat) },
+        // Add more bots here...
+    };
+
+    List<Message> masterDocument = new List<Message>();
+
+    private async Task RemoveMessage(Message message)
+    {
+        if (masterDocument.Contains(message))
+        {
+            masterDocument.Remove(message);
+            await LocalStorage.SetItemAsync("masterDocument", masterDocument);
+        }
+    }
+
+    private async Task AddMessageToMasterDocument(Message message)
+    {
+        masterDocument.Add(message);
+        await LocalStorage.SetItemAsync("masterDocument", masterDocument);
+    }
+
+    private void ExportMasterDocument()
+    {
+        // ToDo: loop through masterdocument and create a file
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+
+        LocalStorage.Changed += OnLocalStorageChanged;
+
+        masterDocument = await LocalStorage.GetItemAsync<List<Message>>("masterDocument") ?? new List<Message>();
+    }
+
+    public void Dispose()
+    {
+        LocalStorage.Changed -= OnLocalStorageChanged;
+    }
+
+    private async void OnLocalStorageChanged(object sender, ChangedEventArgs e)
+    {
+        if (e.Key == "OnAddToMasterDocument")
+        {
+            // The master document has changed. Reload it from local storage.
+            var message = await LocalStorage.GetItemAsync<Message>("OnAddToMasterDocument");
+            await AddMessageToMasterDocument(message);
+            StateHasChanged();
+        } 
+    }
+}

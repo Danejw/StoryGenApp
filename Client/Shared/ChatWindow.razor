@@ -1,0 +1,239 @@
+﻿@using Radzen.Blazor
+@using StoryGenApp.Shared.Models;
+@using System.Diagnostics;
+@using Blazored.LocalStorage;
+@using System.Text.Json;
+@using System.Net.Http.Json;
+@using Microsoft.JSInterop;
+@using Radzen;
+
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
+@inject DialogService DialogService
+@inject HttpClient Http
+
+
+<RadzenCard Style="height: auto; overflow: auto; margin-bottom: 10px;">
+
+    <RadzenRow>      
+        <RadzenColumn Size="2">
+            <RadzenButton Text="Clear All" Size="ButtonSize.ExtraSmall" ButtonStyle="ButtonStyle.Danger" Click="(() => ClearAllMessages())" Style="float:left;" />
+        </RadzenColumn>
+        <RadzenColumn Size="8">
+            <RadzenHeading Size="H3" Text="@Title" Style="text-align: center; margin: 10px 0;" />
+        </RadzenColumn>         
+        <RadzenColumn Size="2">
+            
+            <RadzenSwitch @bind-Value=@contextSwitch title="Context" Style="float:right;" Change=@(args => OnChange(args, "ContextSwitch")) />
+        </RadzenColumn>       
+    </RadzenRow>
+
+    @foreach (var message in messages.ToList())
+    {
+        <RadzenCard Style="margin-bottom: 10px;">
+            <RadzenContent>
+                <RadzenRow>
+                    <RadzenColumn Size="10" Style="word-wrap: break-word;">
+                        <strong>@message.Sender:</strong>
+                        <p>@message.Text</p>
+                    </RadzenColumn>
+                    <RadzenColumn Size="2">                 
+                        @if (message.Sender == AssistantName)
+                        {
+                            <RadzenButton Text="Add" Size="ButtonSize.ExtraSmall" Click="(() => AddToMasterDocument(message))" Style="float:right;" />
+                        }
+                        <RadzenButton Text="Delete" Size="ButtonSize.ExtraSmall" ButtonStyle="ButtonStyle.Danger" Click="(() => RemoveMessage(message))" Style="float:right;" />
+                    </RadzenColumn>
+
+                </RadzenRow>
+            </RadzenContent>
+        </RadzenCard>
+    }
+</RadzenCard>
+
+<RadzenCard>
+    <RadzenTextBox @bind-Value="newMessage" Style="width: 80%;" Placeholder="Type your message here..." />
+    <RadzenButton Text="Send" Click="@(async () => await SendButtonClicked(newMessage, "User"))" Style="float:right;" />
+    <br>
+
+    <!--
+    <RadzenTextBox @bind-Value="newBotMessage" Style="width: 80%;" Placeholder="Type the bot's message here..." />
+    <RadzenButton Text="Bot" Click="@(() => AddMessage(newBotMessage, AssistantName))" Style="float:right;" />
+     -->
+</RadzenCard>
+
+@code {
+    [Parameter] public string Title { get; set; } = "Chat";
+    [Parameter] public string AssistantName { get; set; } = "Bot";
+    [Parameter] public string OpeningDescription { get; set; } = "Hello, how can I help you?";
+    [Parameter] public string UrlEndpoint { get; set; }
+    [Parameter] public string HistoryKey { get; set; }
+
+
+    List<Message> messages;
+    string newMessage = "";
+    string newBotMessage = "";
+    private bool contextSwitch = false;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+
+        if (!string.IsNullOrEmpty(HistoryKey))
+            messages = await LocalStorage.GetItemAsync<List<Message>>(HistoryKey) ?? new List<Message>();
+        else
+            messages = new List<Message>();
+
+        if (messages.Count == 0)
+            await AddMessage(OpeningDescription, AssistantName);
+    }
+
+    private async Task AddMessage(string text, string sender)
+    {
+        if (!string.IsNullOrWhiteSpace(text))
+        {
+            messages.Add(new Message { Text = text, Sender = sender });
+
+            if (sender == "User")
+            {
+                newMessage = "";
+            }
+            else
+            {
+                newBotMessage = "";
+            }
+
+            await LocalStorage.SetItemAsync(HistoryKey, messages);
+        }
+    }
+
+    async Task RemoveMessage(Message message)
+    {
+        messages.Remove(message);
+        await LocalStorage.SetItemAsync(HistoryKey, messages);
+    }
+
+    async void AddToMasterDocument(Message message)
+    {
+        if (message.Sender == AssistantName) {
+            await LocalStorage.SetItemAsync("OnAddToMasterDocument", message);
+        }
+    }
+
+    private async Task ClearAllMessages()
+    {
+        messages.Clear();
+        await LocalStorage.ClearAsync();
+    }
+
+
+    async Task SendButtonClicked(string message, string sender)
+    {
+        // Show the dialog before the API call
+        ShowBusyDialog();
+
+        // You may want to add additional validation and sanitization here depending on your API's requirements
+        var sanitizedMessage = System.Net.WebUtility.HtmlEncode(message);
+
+        var url = UrlEndpoint;
+
+        await AddMessage(sanitizedMessage, sender);
+
+        //Console.WriteLine(sanitizedMessage);
+        //Console.WriteLine(url);
+
+        // converts messages into serializable chat messages (either from the master document or chat history)
+        List<SerializableChatMessage> serializableChatMessages = new List<SerializableChatMessage>();
+        switch (contextSwitch)
+        {
+            case true:
+                var master = await LocalStorage.GetItemAsync<List<Message>>("masterDocument") ?? new List<Message>();
+                serializableChatMessages = master.Select(SerializableChatMessage.FromMessage).ToList();         
+                Console.WriteLine("context from master");
+                break;
+            case false:
+                serializableChatMessages = messages.Select(SerializableChatMessage.FromMessage).ToList();
+                Console.WriteLine("context from chat history");
+                break;
+        }
+
+        var input = new ChatInputModel
+            {
+                userMessage = sanitizedMessage,
+                chatHistory = serializableChatMessages  // Replace null with the actual chat history if available
+            };
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync(url, input);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var botResponse = await response.Content.ReadAsStringAsync();
+
+                // Again, you may want to add additional validation and sanitization here depending on your API's requirements
+                //var sanitizedBotResponse = System.Net.WebUtility.HtmlEncode(botResponse);
+                //AddMessage(sanitizedBotResponse, AssistantName);
+                await AddMessage(botResponse, AssistantName);
+
+                //Console.WriteLine(response);
+
+                // Close the dialog after the API call
+                DialogService.Close();
+            }
+            else
+            {
+                // Depending on your use case, you may want to do something more user-friendly here
+                //Console.WriteLine("The API request was not successful. Status code: " + response.StatusCode);
+
+                // Close the dialog after the API call
+                DialogService.Close();
+            }
+        }
+        catch (Exception ex)
+        {
+            // Depending on your use case, you may want to do something more user-friendly here
+            //Console.WriteLine("An error occurred while sending the API request: " + ex.Message);
+
+            // Close the dialog after the API call
+            DialogService.Close();
+        }
+    }
+
+    public class ChatInputModel
+    {
+        public string userMessage { get; set; }
+        public List<SerializableChatMessage>? chatHistory { get; set; }
+    }
+
+    // ContextSwitch
+    void OnChange(bool? value, string name)
+    {
+        // send master document or chat history
+        switch (value)
+        {
+            case true:
+                contextSwitch = true;
+                Console.WriteLine("context switch to master");
+                break;
+            case false:
+                contextSwitch = false;
+                Console.WriteLine("context switch to chat history");
+                break;
+        }
+    }
+
+    async void ShowBusyDialog()
+    {
+        string customMessage = "Please hold on, I'm thinking...";
+        string customImagePath = "images/StoryGenIcon.png";
+
+        await DialogService.OpenAsync("", ds =>
+        @<RadzenStack AlignItems="AlignItems.Center" Gap="2rem" Class="rz-p-12">
+            <RadzenImage Path="@customImagePath" Style="width: 200px;" />
+            <RadzenText TextStyle="TextStyle.H6">@customMessage</RadzenText>
+        </RadzenStack>, new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto", CloseDialogOnEsc = false });
+    }
+
+    
+}
