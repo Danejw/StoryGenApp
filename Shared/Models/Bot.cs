@@ -2,8 +2,8 @@
 {
     public class Bot
     {
-        public string Key { get; set; }
-        public Type ComponentType { get; set; }
+        public string? Key { get; set; }
+        public Type? ComponentType { get; set; }
         public bool IsVisible { get; set; }
     }
 }
