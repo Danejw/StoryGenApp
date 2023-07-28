@@ -5,10 +5,10 @@ on:
     - master
 env:
   AZURE_WEBAPP_NAME: StoryGenApp
-  AZURE_WEBAPP_PACKAGE_PATH: Server\published
+  AZURE_WEBAPP_PACKAGE_PATH: Client\published
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 7.0.x
-  WORKING_DIRECTORY: Server
+  WORKING_DIRECTORY: Client
 jobs:
   build:
     runs-on: windows-latest
@@ -44,5 +44,5 @@ jobs:
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        publish-profile: ${{ secrets.StoryGenApp_8BDE }}
+        publish-profile: ${{ secrets.StoryGenApp_E608 }}
         package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
