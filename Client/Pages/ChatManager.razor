@@ -115,7 +115,7 @@
         LocalStorage.Changed -= OnLocalStorageChanged;
     }
 
-    private async void OnLocalStorageChanged(object sender, ChangedEventArgs e)
+    private async void OnLocalStorageChanged(object? sender, ChangedEventArgs e)
     {
         if (e.Key == "OnAddToMasterDocument")
         {

@@ -15,7 +15,7 @@ namespace StoryGenApp.Shared.Models
         [JsonProperty("name")]
         public string? Name { get; set; }
 
-        public SerializableChatMessage(string role = null, string content = null, string name = null)
+        public SerializableChatMessage(string role="", string content="", string name="")
         {
             Role = role;
             Content = content;
