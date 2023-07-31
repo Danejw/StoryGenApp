@@ -1,0 +1,38 @@
+﻿@page "/Engineer"
+
+<h3>Engineer</h3>
+
+
+<RadzenHeading Size="H1" Text="GPT Engineer Home" />
+
+<RadzenCard>
+    <RadzenHeading Size="H2" Text="Welcome to the GPT Engineer application!" />
+    <RadzenText>
+        This application allows you to train models, run benchmarks, test models, and chat with models.
+        Use the navigation bar to access these features.
+    </RadzenText>
+
+    <RadzenButton Text="Train Models" Click="@(args => NavigateToModelTraining())" Style="margin: 10px;" />
+    <RadzenButton Text="Run Benchmarks" Click="@(args => NavigateToBenchmarking())" Style="margin: 10px;" />
+    <RadzenButton Text="Test Models" Click="@(args => NavigateToTesting())" Style="margin: 10px;" />
+    <RadzenButton Text="Chat" Click="@(args => NavigateToChat())" Style="margin: 10px;" />
+</RadzenCard>
+
+@code {
+    void NavigateToModelTraining() {
+        //NavigationManager.NavigateTo("/model_training");
+    }
+
+    void NavigateToBenchmarking() {
+        //NavigationManager.NavigateTo("/benchmarking");
+    }
+
+    void NavigateToTesting() {
+        //NavigationManager.NavigateTo("/testing");
+    }
+
+    void NavigateToChat() {
+        //NavigationManager.NavigateTo("/chat");
+    }
+}
+

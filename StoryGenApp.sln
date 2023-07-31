@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33815.320
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoryGenApp.Server", "Server\StoryGenApp.Server.csproj", "{5E06C466-4676-4BBF-BB80-ECD382072CD1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoryGenApp.Server", "Server\StoryGenApp.Server.csproj", "{5E06C466-4676-4BBF-BB80-ECD382072CD1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoryGenApp.Client", "Client\StoryGenApp.Client.csproj", "{7AAACE35-ACE3-49EA-B24B-CB219EB9F5F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoryGenApp.Client", "Client\StoryGenApp.Client.csproj", "{7AAACE35-ACE3-49EA-B24B-CB219EB9F5F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoryGenApp.Shared", "Shared\StoryGenApp.Shared.csproj", "{AA43A258-E330-4EB2-A501-CEB7CB4F7D02}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoryGenApp.Shared", "Shared\StoryGenApp.Shared.csproj", "{AA43A258-E330-4EB2-A501-CEB7CB4F7D02}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

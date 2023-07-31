@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "StoryGenApp.Shared": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Production"
+      }
+    }
+  }
+}
